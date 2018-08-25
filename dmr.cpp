@@ -532,7 +532,6 @@ void DSDDMR::processVoiceFirstHalfMS()
 void DSDDMR::processDataDibit(unsigned char dibit)
 {
 	// CACH
-
 	if (m_symbolIndex < 12)
 	{
 	    if (m_burstType == DSDDMRBaseStation)
@@ -942,6 +941,38 @@ bool DSDDMR::processEMB()
     }
 }
 
+//for (int i = 0; i < 90; i++) {
+//    bufV1H[2*i]     = (dibit_p[i] >> 1) & 1;
+//    bufV1H[2*i + 1] = dibit_p[i] & 1;
+//}
+//std::string str;
+
+//for (int i = 0; i < 180; i++) {
+//    str+= std::to_string(bufV1H[i]);
+//}
+//  fprintf(stderr, "%s \n", str.c_str());
+//    fprintf(stderr, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d \n", bufV1H[0], bufV1H[1],
+//                bufV1H[2],bufV1H[3], bufV1H[4],
+//                bufV1H[5], bufV1H[6], bufV1H[7], bufV1H[8], bufV1H[9], bufV1H[10], bufV1H[11],
+//                bufV1H[12], bufV1H[13],
+//                bufV1H[14], bufV1H[15], bufV1H[16],
+//                bufV1H[17], bufV1H[18], bufV1H[19], bufV1H[20],
+//                bufV1H[21], bufV1H[22],
+//                bufV1H[23], bufV1H[24], bufV1H[25], bufV1H[26], bufV1H[27],
+//                bufV1H[28], bufV1H[29], bufV1H[30], bufV1H[31]);
+
+//                std::string str;
+
+//                for (int i = 1; i < 129; i++) {
+//                    str +=" ";
+//                    str += std::to_string(voiceEmbSigRawBits[i-1]);
+//                    if(i%16 == 0) {
+//                        str +="\n";
+//                    }
+//                }
+
+//                fprintf(stderr, "%s \n", str.c_str());
+
 bool DSDDMR::processVoiceEmbeddedSignalling(int& voiceEmbSig_dibitsIndex,
         unsigned char *voiceEmbSigRawBits,
         bool& voiceEmbSig_OK,
@@ -982,12 +1013,25 @@ bool DSDDMR::processVoiceEmbeddedSignalling(int& voiceEmbSig_dibitsIndex,
             voiceEmbSig_dibitsIndex++;
         }
 
-        if (voiceEmbSig_dibitsIndex == 16*4) // BPTC matrix collected
-        {
+        if (voiceEmbSig_dibitsIndex == 16*4) {// BPTC matrix collected
             fprintf(stderr, "BPTC matrix collected:\n");
-            if (m_hamming_16_11_4.decode(voiceEmbSigRawBits, 0, 7)) // TODO: 5 bit checksum
-            {
-            fprintf(stderr, "m_hamming_16_11_4.decoded:\n");
+            unsigned char decodedBits[11*7];
+            memset(decodedBits, 0, 11*7);
+            std::string str;
+            if (m_hamming_16_11_4.decode(voiceEmbSigRawBits, decodedBits, 7)) { // TODO: 5 bit checksum
+                fprintf(stderr, "m_hamming_16_11_4.decoded:\n");
+
+                for (int i = 1; i <= 77; i++) {
+                    str +=" ";
+                    str+= std::to_string(decodedBits[i-1]);
+                    if(i%11 == 0) {
+                        str +="\n";
+                    }
+
+                }
+
+                fprintf(stderr, "%s \n", str.c_str());
+
                 unsigned char flco = (voiceEmbSigRawBits[2] << 5)
                         + (voiceEmbSigRawBits[3] << 4)
                         + (voiceEmbSigRawBits[4] << 3)
@@ -1045,8 +1089,8 @@ bool DSDDMR::processVoiceEmbeddedSignalling(int& voiceEmbSig_dibitsIndex,
                         + (voiceEmbSigRawBits[16*6 + 9]);      // (LC0)
 
                 fprintf(stderr, "m_group: %i\n", addresses.m_group);
-                fprintf(stderr, "m_target: %i\n", addresses.m_target);
-                fprintf(stderr, "m_source: %i\n", addresses.m_source);
+                fprintf(stderr, "m_target: %08u\n", addresses.m_target);
+                fprintf(stderr, "m_source: %08u\n", addresses.m_source);
                 return true; // we have a result
             }
             else
