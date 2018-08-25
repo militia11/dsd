@@ -984,9 +984,10 @@ bool DSDDMR::processVoiceEmbeddedSignalling(int& voiceEmbSig_dibitsIndex,
 
         if (voiceEmbSig_dibitsIndex == 16*4) // BPTC matrix collected
         {
-            fprintf(stderr, "Display Options:\n");
+            fprintf(stderr, "BPTC matrix collected:\n");
             if (m_hamming_16_11_4.decode(voiceEmbSigRawBits, 0, 7)) // TODO: 5 bit checksum
             {
+            fprintf(stderr, "m_hamming_16_11_4.decoded:\n");
                 unsigned char flco = (voiceEmbSigRawBits[2] << 5)
                         + (voiceEmbSigRawBits[3] << 4)
                         + (voiceEmbSigRawBits[4] << 3)
