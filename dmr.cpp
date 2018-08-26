@@ -515,6 +515,25 @@ void DSDDMR::processVoiceFirstHalfMS()
 {
     unsigned char *dibit_p = m_dsdDecoder->m_dsdSymbol.getDibitBack(78+1); // no CACH with MS
 
+//    unsigned char bufV1H[180];
+//    memset(bufV1H, 0, 180);
+//    for (int i = 0; i < 90; i++) {
+//        bufV1H[2*i]     = (dibit_p[i] >> 1) & 1;
+//        bufV1H[2*i + 1] = dibit_p[i] & 1;
+//    }
+
+//    std::string str;
+//    for (int i = 1; i <= 180; i++) {
+//        str +=" ";
+//        str+= std::to_string(bufV1H[i-1]);
+//        if(i%16 == 0) {
+//            str +="\n";
+//        }
+//    }
+//    str +="\n";
+
+//    fprintf(stderr, "Dane voice lewa strona pierwszej ramki:\n%s", str.c_str());` q
+
     for (m_symbolIndex = 12; m_symbolIndex < 90; m_symbolIndex++, m_cachSymbolIndex++)
     {
         processVoiceDibit(dibit_p[m_symbolIndex]);
@@ -940,38 +959,6 @@ bool DSDDMR::processEMB()
         return false;
     }
 }
-
-//for (int i = 0; i < 90; i++) {
-//    bufV1H[2*i]     = (dibit_p[i] >> 1) & 1;
-//    bufV1H[2*i + 1] = dibit_p[i] & 1;
-//}
-//std::string str;
-
-//for (int i = 0; i < 180; i++) {
-//    str+= std::to_string(bufV1H[i]);
-//}
-//  fprintf(stderr, "%s \n", str.c_str());
-//    fprintf(stderr, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d \n", bufV1H[0], bufV1H[1],
-//                bufV1H[2],bufV1H[3], bufV1H[4],
-//                bufV1H[5], bufV1H[6], bufV1H[7], bufV1H[8], bufV1H[9], bufV1H[10], bufV1H[11],
-//                bufV1H[12], bufV1H[13],
-//                bufV1H[14], bufV1H[15], bufV1H[16],
-//                bufV1H[17], bufV1H[18], bufV1H[19], bufV1H[20],
-//                bufV1H[21], bufV1H[22],
-//                bufV1H[23], bufV1H[24], bufV1H[25], bufV1H[26], bufV1H[27],
-//                bufV1H[28], bufV1H[29], bufV1H[30], bufV1H[31]);
-
-//                std::string str;
-
-//                for (int i = 1; i < 129; i++) {
-//                    str +=" ";
-//                    str += std::to_string(voiceEmbSigRawBits[i-1]);
-//                    if(i%16 == 0) {
-//                        str +="\n";
-//                    }
-//                }
-
-//                fprintf(stderr, "%s \n", str.c_str());
 
 bool DSDDMR::processVoiceEmbeddedSignalling(int& voiceEmbSig_dibitsIndex,
         unsigned char *voiceEmbSigRawBits,
